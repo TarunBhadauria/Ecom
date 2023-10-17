@@ -95,9 +95,14 @@ exports.login = async (req, res) => {
 
 
     if (await bcrypt.compare(password, existingUser.password)) {
+      const loggedUser = {};
+      loggedUser.userName = existingUser.userName;
+      loggedUser.userId = existingUser._id;
+      loggedUser.email = existingUser.email;
       return res.status(200).json({
         success: true,
         message: "Login success",
+        user: loggedUser
       });
     } else {
       return res.status(406).json({
@@ -106,7 +111,7 @@ exports.login = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log("Error while logging in",error);
+    console.log("Error while logging in", error);
     return res.status(500).json({
       success: false,
       message: "Error while logging in",
@@ -114,42 +119,42 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.sendOtp = async (req,res) =>{
+exports.sendOtp = async (req, res) => {
 
-    const{email} = req.body;
+  const { email } = req.body;
 
-    const existingEmail = await User.find({email});
+  const existingEmail = await User.find({ email });
 
-    if(existingEmail){
-        return res.status(409).json({
-            success:false,
-            message:"Email already registered"
-        });
-    }
-
-    let createdOtp = otpGenerator.generate(6,{
-        upperCaseAlphabets:false,
-        lowerCaseAlphabets:false,
-        specialChars:false
+  if (existingEmail) {
+    return res.status(409).json({
+      success: false,
+      message: "Email already registered"
     });
+  }
 
-    const existingOtp = await Otp.find({otp:createdOtp});
+  let createdOtp = otpGenerator.generate(6, {
+    upperCaseAlphabets: false,
+    lowerCaseAlphabets: false,
+    specialChars: false
+  });
 
-    while(existingOtp){
-        createdOtp = otpGenerator.generate(6,{
-            upperCaseAlphabets:false
-        })
-    }
+  const existingOtp = await Otp.find({ otp: createdOtp });
 
-    const otpPayload = {email,createdOtp};
+  while (existingOtp) {
+    createdOtp = otpGenerator.generate(6, {
+      upperCaseAlphabets: false
+    })
+  }
 
-    await Otp.create(otpPayload);
+  const otpPayload = { email, createdOtp };
 
-    res.status(200).json({
-        success:true,
-        message:"Otp Sent Successfully",
-        otp:createdOtp
-    });
+  await Otp.create(otpPayload);
+
+  res.status(200).json({
+    success: true,
+    message: "Otp Sent Successfully",
+    otp: createdOtp
+  });
 
 
 

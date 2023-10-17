@@ -5,6 +5,27 @@ const orderSchema = new mongoose({
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
+    items:[
+        {
+            product_id :{
+                type:mongoose.Schema.Types.ObjectId,
+                ref:"Product"
+            },
+            quantity:{
+                type:string,
+                required:true,
+                default:1,
+                unitPrice:{
+                    type:Number,
+                    required:true
+                },
+                totalPrice:{
+                    type:Number,
+                    required:true
+                }
+            }
+        }
+    ],
     orderedOn:{
         type:Date, 
         required:true,
