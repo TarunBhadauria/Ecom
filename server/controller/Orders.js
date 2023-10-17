@@ -7,7 +7,7 @@ exports.createOrder = async (req, res) => {
     try {
         const { userId, totalAmount, items } = req.body;
 
-        if (!userId || !amount || !items) {
+        if (!userId || !totalAmount || !items) {
             return res.status(404).json({
                 success: false,
                 response: "All fields are mandatory"
@@ -50,5 +50,53 @@ exports.getOrders = async(req,res)=>{
             success:false,
             message:"Something went wrong while getting orders"
         });
+    }
+}
+
+exports.updateOrders = async(req,res)=>{
+    try{
+        const { userId, totalAmount, items } = req.body;
+
+        if (!userId || !totalAmount || !items) {
+            return res.status(404).json({
+                success: false,
+                response: "All fields are mandatory"
+            });
+        }
+
+        const updatedOrder = await Orders.findOneAndUpdate({userId},{ totalAmount, items},{new:true});
+
+        return res.status(200).json({
+            success: true,
+            message:"Order updated successfully",
+            response:updatedOrder
+        })
+
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong while updating order"
+        })
+    }
+}
+
+
+exports.deleteOrder = async (req,res) =>{
+    try{
+        const {orderId} = req.body;
+
+        const removedOrder = await Orders.findOneAndDelete({orderId});
+
+        return res.status(200).json({
+            success:true,
+            message:"Order cancelled successfully",
+            response:removedOrder
+        });
+
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong while deleting order"
+        })
     }
 }
